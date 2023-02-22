@@ -4,7 +4,7 @@ local b='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
 local MOD = 2^32
 local MODM = MOD-1
 
-local function memoize(f)
+ function memoize(f)
 	local mt = {}
 	local t = setmetatable({}, mt)
 	function mt:__index(k)
@@ -15,7 +15,7 @@ local function memoize(f)
 	return t
 end
 
-local function make_bitop_uncached(t, m)
+ function make_bitop_uncached(t, m)
 	local function bitop(a, b)
 		local res,p = 0,1
 		while a ~= 0 and b ~= 0 do
@@ -31,15 +31,15 @@ local function make_bitop_uncached(t, m)
 	return bitop
 end
 
-local function make_bitop(t)
+ function make_bitop(t)
 	local op1 = make_bitop_uncached(t,2^1)
 	local op2 = memoize(function(a) return memoize(function(b) return op1(a, b) end) end)
 	return make_bitop_uncached(op2, 2 ^ (t.n or 1))
 end
 
-local bxor1 = make_bitop({[0] = {[0] = 0,[1] = 1}, [1] = {[0] = 1, [1] = 0}, n = 4})
+ bxor1 = make_bitop({[0] = {[0] = 0,[1] = 1}, [1] = {[0] = 1, [1] = 0}, n = 4})
 
-local function bxor(a, b, c, ...)
+ function bxor(a, b, c, ...)
 	local z = nil
 	if b then
 		a = a % MOD
@@ -51,7 +51,7 @@ local function bxor(a, b, c, ...)
 	else return 0 end
 end
 
-local function band(a, b, c, ...)
+ function band(a, b, c, ...)
 	local z
 	if b then
 		a = a % MOD
@@ -63,24 +63,24 @@ local function band(a, b, c, ...)
 	else return MODM end
 end
 
-local function bnot(x) return (-1 - x) % MOD end
+ function bnot(x) return (-1 - x) % MOD end
 
-local function rshift1(a, disp)
+ function rshift1(a, disp)
 	if disp < 0 then return lshift(a,-disp) end
 	return math.floor(a % 2 ^ 32 / 2 ^ disp)
 end
 
-local function rshift(x, disp)
+ function rshift(x, disp)
 	if disp > 31 or disp < -31 then return 0 end
 	return rshift1(x % MOD, disp)
 end
 
-local function lshift(a, disp)
+ function lshift(a, disp)
 	if disp < 0 then return rshift(a,-disp) end 
 	return (a * 2 ^ disp) % 2 ^ 32
 end
 
-local function rrotate(x, disp)
+ function rrotate(x, disp)
     x = x % MOD
     disp = disp % 32
     local low = band(x, 2 ^ disp - 1)
@@ -106,11 +106,11 @@ local k = {
 	0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
 }
 
-local function str2hexa(s)
+ function str2hexa(s)
 	return (string.gsub(s, ".", function(c) return string.format("%02x", string.byte(c)) end))
 end
 
-local function num2s(l, n)
+ function num2s(l, n)
 	local s = ""
 	for i = 1, n do
 		local rem = l % 256
@@ -120,13 +120,13 @@ local function num2s(l, n)
 	return s
 end
 
-local function s232num(s, i)
+ function s232num(s, i)
 	local n = 0
 	for i = i, i + 3 do n = n*256 + string.byte(s, i) end
 	return n
 end
 
-local function preproc(msg, len)
+ function preproc(msg, len)
 	local extra = 64 - ((len + 9) % 64)
 	len = num2s(8 * len, 8)
 	msg = msg .. "\128" .. string.rep("\0", extra) .. len
@@ -134,7 +134,7 @@ local function preproc(msg, len)
 	return msg
 end
 
-local function initH256(H)
+ function initH256(H)
 	H[1] = 0x6a09e667
 	H[2] = 0xbb67ae85
 	H[3] = 0x3c6ef372
@@ -146,7 +146,7 @@ local function initH256(H)
 	return H
 end
 
-local function digestblock(msg, i, H)
+ function digestblock(msg, i, H)
 	local w = {}
 	for j = 1, 16 do w[j] = s232num(msg, i + (j - 1)*4) end
 	for j = 17, 64 do
