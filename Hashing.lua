@@ -1,4 +1,3 @@
-  local key = "TestKey"
 
 local b='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/' 
 
