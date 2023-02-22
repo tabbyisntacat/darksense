@@ -1,5 +1,12 @@
-local b='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/' 
-
+-- From http://pastebin.com/gsFrNjbt linked from http://www.computercraft.info/forums2/index.php?/topic/8169-sha-256-in-pure-lua/
+--  
+--  Adaptation of the Secure Hashing Algorithm (SHA-244/256)
+--  Found Here: http://lua-users.org/wiki/SecureHashAlgorithm
+--  
+--  Using an adapted version of the bit library
+--  Found Here: https://bitbucket.org/Boolsheet/bslf/src/1ee664885805/bit.lua
+--  
+-- SHA256 hash for IP Hashing
 local MOD = 2^32
 local MODM = MOD-1
 
@@ -185,7 +192,7 @@ function sha256(msg)
 		num2s(H[5], 4) .. num2s(H[6], 4) .. num2s(H[7], 4) .. num2s(H[8], 4))
 end
 
-
+local b='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/' 
 function enc(data)
     return ((data:gsub('.', function(x) 
         local r,b='',x:byte()
@@ -213,4 +220,3 @@ function dec(data)
             return string.char(c)
     end))
 end
-
