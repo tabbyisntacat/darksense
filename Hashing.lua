@@ -1,10 +1,9 @@
-
 local b='ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/' 
 
 local MOD = 2^32
 local MODM = MOD-1
 
- function memoize(f)
+local function memoize(f)
 	local mt = {}
 	local t = setmetatable({}, mt)
 	function mt:__index(k)
@@ -15,7 +14,7 @@ local MODM = MOD-1
 	return t
 end
 
- function make_bitop_uncached(t, m)
+local function make_bitop_uncached(t, m)
 	local function bitop(a, b)
 		local res,p = 0,1
 		while a ~= 0 and b ~= 0 do
@@ -31,15 +30,15 @@ end
 	return bitop
 end
 
- function make_bitop(t)
+local function make_bitop(t)
 	local op1 = make_bitop_uncached(t,2^1)
 	local op2 = memoize(function(a) return memoize(function(b) return op1(a, b) end) end)
 	return make_bitop_uncached(op2, 2 ^ (t.n or 1))
 end
 
- bxor1 = make_bitop({[0] = {[0] = 0,[1] = 1}, [1] = {[0] = 1, [1] = 0}, n = 4})
+local bxor1 = make_bitop({[0] = {[0] = 0,[1] = 1}, [1] = {[0] = 1, [1] = 0}, n = 4})
 
- function bxor(a, b, c, ...)
+local function bxor(a, b, c, ...)
 	local z = nil
 	if b then
 		a = a % MOD
@@ -51,7 +50,7 @@ end
 	else return 0 end
 end
 
- function band(a, b, c, ...)
+local function band(a, b, c, ...)
 	local z
 	if b then
 		a = a % MOD
@@ -63,24 +62,24 @@ end
 	else return MODM end
 end
 
- function bnot(x) return (-1 - x) % MOD end
+local function bnot(x) return (-1 - x) % MOD end
 
- function rshift1(a, disp)
+local function rshift1(a, disp)
 	if disp < 0 then return lshift(a,-disp) end
 	return math.floor(a % 2 ^ 32 / 2 ^ disp)
 end
 
- function rshift(x, disp)
+local function rshift(x, disp)
 	if disp > 31 or disp < -31 then return 0 end
 	return rshift1(x % MOD, disp)
 end
 
- function lshift(a, disp)
+local function lshift(a, disp)
 	if disp < 0 then return rshift(a,-disp) end 
 	return (a * 2 ^ disp) % 2 ^ 32
 end
 
- function rrotate(x, disp)
+local function rrotate(x, disp)
     x = x % MOD
     disp = disp % 32
     local low = band(x, 2 ^ disp - 1)
@@ -106,11 +105,11 @@ local k = {
 	0x90befffa, 0xa4506ceb, 0xbef9a3f7, 0xc67178f2,
 }
 
- function str2hexa(s)
+local function str2hexa(s)
 	return (string.gsub(s, ".", function(c) return string.format("%02x", string.byte(c)) end))
 end
 
- function num2s(l, n)
+local function num2s(l, n)
 	local s = ""
 	for i = 1, n do
 		local rem = l % 256
@@ -120,13 +119,13 @@ end
 	return s
 end
 
- function s232num(s, i)
+local function s232num(s, i)
 	local n = 0
 	for i = i, i + 3 do n = n*256 + string.byte(s, i) end
 	return n
 end
 
- function preproc(msg, len)
+local function preproc(msg, len)
 	local extra = 64 - ((len + 9) % 64)
 	len = num2s(8 * len, 8)
 	msg = msg .. "\128" .. string.rep("\0", extra) .. len
@@ -134,7 +133,7 @@ end
 	return msg
 end
 
- function initH256(H)
+local function initH256(H)
 	H[1] = 0x6a09e667
 	H[2] = 0xbb67ae85
 	H[3] = 0x3c6ef372
@@ -146,7 +145,7 @@ end
 	return H
 end
 
- function digestblock(msg, i, H)
+local function digestblock(msg, i, H)
 	local w = {}
 	for j = 1, 16 do w[j] = s232num(msg, i + (j - 1)*4) end
 	for j = 17, 64 do
@@ -214,8 +213,4 @@ function dec(data)
             return string.char(c)
     end))
 end
-
-
-
-
 
